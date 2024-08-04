@@ -2,7 +2,8 @@ import nltk
 from nltk import word_tokenize
 from nltk.util import ngrams
 from collections import Counter, defaultdict
-import random
+import matplotlib.pyplot as plt
+import os
 
 # Ensure nltk resources are available
 nltk.download('punkt')
@@ -40,29 +41,63 @@ def predict_next_word(word):
     next_word = max(possible_words, key=possible_words.get)
     return next_word
 
-# Display outputs
+# Writing the output to a file
+output_file = "ngram_output.txt"
 
-# Unigrams
-print("Unigrams and their frequencies:")
-for word, count in unigram_counts.items():
-    print(f"{word}: {count}")
+with open(output_file, "w") as file:
+    # Unigrams
+    file.write("Unigrams and their frequencies:\n")
+    for word, count in unigram_counts.items():
+        file.write(f"{word}: {count}\n")
+    
+    file.write("\nBigrams and their frequencies:\n")
+    for bigram, count in bigram_counts.items():
+        file.write(f"{bigram}: {count}\n")
+    
+    file.write("\nTrigrams and their frequencies:\n")
+    for trigram, count in trigram_counts.items():
+        file.write(f"{trigram}: {count}\n")
+    
+    file.write("\nBigram Probabilities:\n")
+    for w1, w2_probs in bigram_probabilities.items():
+        for w2, prob in w2_probs.items():
+            file.write(f"P({w2} | {w1}) = {prob:.2f}\n")
 
-print("\nBigrams and their frequencies:")
-for bigram, count in bigram_counts.items():
-    print(f"{bigram}: {count}")
+    # Next word prediction examples
+    test_words = ['the', 'quick', 'fox']
+    file.write("\nNext Word Predictions:\n")
+    for word in test_words:
+        next_word = predict_next_word(word)
+        file.write(f"Next word after '{word}': {next_word}\n")
 
-print("\nTrigrams and their frequencies:")
-for trigram, count in trigram_counts.items():
-    print(f"{trigram}: {count}")
+print(f"Output written to {output_file}")
 
-print("\nBigram Probabilities:")
-for w1, w2_probs in bigram_probabilities.items():
-    for w2, prob in w2_probs.items():
-        print(f"P({w2} | {w1}) = {prob:.2f}")
+# Plotting the graphs
+def plot_frequency_graph(data, title, xlabel, ylabel, output_filename):
+    words, frequencies = zip(*data)
+    plt.figure(figsize=(12, 6))
+    plt.bar(words, frequencies, color='skyblue')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(output_filename)
+    plt.close()
+    print(f"{title} graph saved as {output_filename}")
 
-# Next word prediction examples
-test_words = ['the', 'quick', 'fox']
-print("\nNext Word Predictions:")
-for word in test_words:
-    next_word = predict_next_word(word)
-    print(f"Next word after '{word}': {next_word}")
+# Plot Unigram Frequencies
+unigram_data = unigram_counts.most_common(10) # Top 10 unigrams
+plot_frequency_graph(unigram_data, 'Top 10 Unigram Frequencies', 'Unigrams', 'Frequency', 'unigram_frequencies.png')
+
+# Plot Bigram Frequencies
+bigram_data = bigram_counts.most_common(10) # Top 10 bigrams
+bigram_labels = [f"{w1} {w2}" for (w1, w2) in bigram_data]
+bigram_frequencies = [count for _, count in bigram_data]
+plot_frequency_graph(list(zip(bigram_labels, bigram_frequencies)), 'Top 10 Bigram Frequencies', 'Bigrams', 'Frequency', 'bigram_frequencies.png')
+
+# Plot Trigram Frequencies
+trigram_data = trigram_counts.most_common(10) # Top 10 trigrams
+trigram_labels = [f"{w1} {w2} {w3}" for (w1, w2, w3) in trigram_data]
+trigram_frequencies = [count for _, count in trigram_data]
+plot_frequency_graph(list(zip(trigram_labels, trigram_frequencies)), 'Top 10 Trigram Frequencies', 'Trigrams', 'Frequency', 'trigram_frequencies.png')
