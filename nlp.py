@@ -91,12 +91,12 @@ plot_frequency_graph(unigram_data, 'Top 10 Unigram Frequencies', 'Unigrams', 'Fr
 
 # Plot Bigram Frequencies
 bigram_data = bigram_counts.most_common(10) # Top 10 bigrams
-bigram_labels = [f"{w1} {w2}" for (w1, w2) in [pair for pair, count in bigram_data]]
+bigram_labels = [f"{w1} {w2}" for (w1, w2) in [pair for pair, _ in bigram_data]]
 bigram_frequencies = [count for _, count in bigram_data]
 plot_frequency_graph(list(zip(bigram_labels, bigram_frequencies)), 'Top 10 Bigram Frequencies', 'Bigrams', 'Frequency', 'bigram_frequencies.png')
 
 # Plot Trigram Frequencies
 trigram_data = trigram_counts.most_common(10) # Top 10 trigrams
-trigram_labels = [f"{w1} {w2} {w3}" for (w1, w2, w3) in [triplet for triplet, count in trigram_data]]
+trigram_labels = [f"{w1} {w2} {w3}" for (w1, w2, w3) in [triplet for triplet, _ in trigram_data]]
 trigram_frequencies = [count for _, count in trigram_data]
 plot_frequency_graph(list(zip(trigram_labels, trigram_frequencies)), 'Top 10 Trigram Frequencies', 'Trigrams', 'Frequency', 'trigram_frequencies.png')
